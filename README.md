@@ -6,24 +6,85 @@ Yksinkertainen selainsoitin MP3-tiedostoille ja podcasteille. Soitin muistaa, mi
 
 ## Ominaisuudet
 
-- Toisto ja tauko
-- Hyppy 20 sekuntia taakse- tai eteenpäin
-- Kelauspalkki
+- Toisto ja tauko, kelauspalkki
+- Hyppy taakse- tai eteenpäin, pituus valittavissa: 10, 15, 20 tai 30 s
 - Toistonopeus 0,8×–2×
 - **Muistaa kohdan:** sijainti tallentuu 5 sekunnin välein ja aina kun toisto pysähtyy, esimerkiksi kun otat kuulokkeet pois
-- **Viimeisimmät:** lista viimeisimmistä jaksoista ja kohdista, joihin jäit
-- Kuulokkeiden ja lukitusnäytön painikkeet toimivat (play/tauko, ±20 s)
-- Pikanäppäimet tietokoneella: `välilyönti` = toisto/tauko, `←` `→` = 20 s
+- **Palaa hieman taaksepäin:** kun jatkat yli 2 minuutin tauon jälkeen, toisto alkaa 10 sekuntia aiemmasta kohdasta
+- **Jatka kuuntelua -lista:** jaksot, edistymispalkki ja jäljellä oleva aika
+- Merkitse jakso kuunnelluksi tai poista se listalta (poiston voi perua)
+- Jakson voi lisätä listalle kuuntelematta sitä heti
+- Asennettavissa puhelimen aloitusnäyttöön omalla kuvakkeella
+- Kuulokkeiden ja lukitusnäytön painikkeet toimivat
+- Pikanäppäimet tietokoneella: `välilyönti` = toisto/tauko, `←` `→` = hyppy
 
 ## Käyttö
 
+### Jakson lisääminen
+
 1. Avaa https://ehken.github.io/player/
-2. Liitä MP3-tiedoston osoite kenttään ja paina **Load**.
-3. Kuuntele. Kun avaat soittimen myöhemmin uudelleen, valitse jakso **Recent**-listasta, niin toisto jatkuu siitä, mihin jäit.
+2. Kopioi MP3-tiedoston osoite leikepöydälle.
+3. Paina oikean yläkulman **+**-painiketta. Alhaalta aukeaa **Add an episode** -paneeli.
+4. Paina **Paste**, niin osoite liitetään kenttään. Voit myös painaa kenttää pitkään ja valita Liitä.
+5. Valitse jompikumpi:
+   - **Play now** aloittaa jakson heti. Jos jakso oli jo kesken, se jatkuu siitä kohdasta.
+   - **Add to list** tallentaa jakson **Continue listening** -listalle myöhempää varten. Meneillään oleva toisto ei keskeydy.
+6. Sulje paneeli tarvittaessa **✕**-painikkeesta tai napauttamalla paneelin ulkopuolelle.
 
-Puhelimessa kannattaa lisätä soitin aloitusnäyttöön, niin se aukeaa kuin sovellus.
+Jakson voi lisätä myös suoraan sivulta kirjanmerkillä, katso [Kirjanmerkki](#kirjanmerkki-jakso-suoraan-sivulta-soittimeen).
 
-## Kirjanmerkki: jakso suoraan artikkelista soittimeen
+### Toisto
+
+- **Iso painike keskellä:** toisto ja tauko.
+- **Vasen ja oikea kaarinuoli:** hyppy taakse- ja eteenpäin. Nuolessa näkyvä numero on hypyn pituus sekunteina.
+- **Kelauspalkki:** vedä palkkia, niin pääset haluamaasi kohtaan. Vasemmalla näkyy kulunut aika, oikealla jäljellä oleva aika.
+- **Speed:** napauta vaihtaaksesi toistonopeutta järjestyksessä 1× → 1,2× → 1,5× → 1,75× → 2× → 0,8×.
+- **Skip:** napauta vaihtaaksesi hypyn pituutta järjestyksessä 10 → 15 → 20 → 30 s. Sama pituus on käytössä kuulokkeiden ja lukitusnäytön painikkeissa.
+
+Nopeus ja hypyn pituus tallentuvat, joten ne ovat samat, kun avaat soittimen seuraavan kerran.
+
+### Kuuntelun jatkaminen
+
+- Sijainti tallentuu automaattisesti. Kun avaat soittimen uudelleen, viimeisin kesken oleva jakso on valmiina siinä kohdassa, mihin jäit. Paina play.
+- Jos taukoa on ollut yli 2 minuuttia, toisto alkaa 10 sekuntia aiemmasta kohdasta, jotta muistat, mihin jäit.
+- Kun jakso loppuu (tai jäljellä on alle 30 sekuntia), se merkitään kuunnelluksi.
+
+### Continue listening -lista
+
+Listalla näkyvät viimeisimmät 12 jaksoa uusimmasta vanhimpaan. Jokaisesta jaksosta näkyy edistymispalkki, jäljellä oleva aika ja prosentti.
+
+- **Avaa jakso:** napauta jakson nimeä. Toisto alkaa siitä, mihin jäit.
+- **Merkitse kuunnelluksi:** napauta **✓**. Jakso saa merkinnän **Listened**. Napauta **✓** uudelleen, niin merkintä poistuu ja jakso alkaa seuraavalla kerralla alusta.
+- **Poista listalta:** napauta **✕**. Jos poistit vahingossa, paina alareunaan ilmestyvää **Undo**-painiketta muutaman sekunnin sisällä.
+- **Current** tarkoittaa soittimessa juuri nyt olevaa jaksoa, **Playing** sitä, joka parhaillaan soi.
+
+### Pikanäppäimet (tietokone)
+
+- `välilyönti`: toisto/tauko
+- `←` / `→`: hyppy taakse / eteen
+
+### Aloitusnäyttöön
+
+Kun soitin on aloitusnäytöllä, se aukeaa omana sovelluksenaan ilman selaimen osoiteriviä.
+
+**iPhone, Safari**
+1. Avaa https://ehken.github.io/player/
+2. Paina **Jaa**-painiketta (neliö ja nuoli ylös).
+3. Valitse **Lisää Koti-valikkoon** ja paina **Lisää**.
+
+**iPhone, Brave**
+1. Avaa https://ehken.github.io/player/
+2. Paina osoiterivin **⋯**-valikkoa ja valitse **Jaa**.
+3. Valitse **Lisää Koti-valikkoon** ja paina **Lisää**.
+
+**Android, Chrome**
+1. Avaa https://ehken.github.io/player/
+2. Paina oikean yläkulman **⋮**-valikkoa.
+3. Valitse **Asenna sovellus** tai **Lisää aloitusnäytölle**.
+
+**Huom. iPhonessa** aloitusnäytöltä avattu soitin pitää oman listansa, erillään selaimesta. Kirjanmerkki avaa jaksot aina selaimessa, joten niiden kohdat ja lista näkyvät selaimessa, eivät aloitusnäytön sovelluksessa. Jos käytät kirjanmerkkiä, käytä soitinta myös selaimessa.
+
+## Kirjanmerkki: jakso suoraan sivulta soittimeen
 
 Monella sivulla podcast-jakson MP3-osoite ei näy suoraan, varsinkaan jos jakso on maksumuurin takana. Kirjanmerkki hoitaa tämän puolestasi. Kun painat sitä sivulla, jolla jakso on, se etsii sivulta jakson MP3-osoitteen ja avaa sen suoraan soittimessa.
 
@@ -62,7 +123,7 @@ Jos sama selain on synkronoitu tietokoneen ja puhelimen välillä (esim. Brave S
    - **iPhone:** avaa kirjanmerkit ja napauta kirjanmerkkiä.
    - **Android Chrome:** kirjoita osoiteriville kirjanmerkin nimi ja valitse se ehdotuksista. Kirjanmerkkilistasta napauttaminen ei toimi Chromessa.
    - **Tietokone:** klikkaa kirjanmerkkiä kirjanmerkkipalkista.
-3. Soitin aukeaa ja lataa jakson. Paina play.
+3. Soitin aukeaa, ja jakso on valmiina siinä kohdassa, mihin jäit (uusi jakso alusta). Paina play.
 
 ### Jos se ei toimi
 
@@ -78,4 +139,4 @@ Jos sama selain on synkronoitu tietokoneen ja puhelimen välillä (esim. Brave S
 
 ## Tekniikka
 
-Yksi HTML-tiedosto (`index.html`), jossa ei ole palvelinta, kirjastoja eikä seurantaa. Soitin toimii GitHub Pagesissa. Jakson voi avata suoraan linkillä muodossa `https://ehken.github.io/player/?url=<MP3-osoite>`.
+Yksi HTML-tiedosto (`index.html`) sekä kuvakkeet ja `manifest.webmanifest` aloitusnäyttöä varten. Ei palvelinta, kirjastoja eikä seurantaa. Soitin toimii GitHub Pagesissa. Jakson voi avata suoraan linkillä muodossa `https://ehken.github.io/player/?url=<MP3-osoite>`.

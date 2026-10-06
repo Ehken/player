@@ -1,0 +1,14 @@
+{
+  "name": "Episode Player",
+  "short_name": "Player",
+  "description": "A simple podcast player that remembers where you left off.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0e12",
+  "theme_color": "#2357d6",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
