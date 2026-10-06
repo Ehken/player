@@ -16,6 +16,7 @@ Yksinkertainen selainsoitin MP3-tiedostoille ja podcasteille. Soitin muistaa, mi
 - Merkitse jakso kuunnelluksi tai poista se listalta (poiston voi perua)
 - Jakson voi lisätä listalle kuuntelematta sitä heti
 - Asennettavissa puhelimen aloitusnäyttöön omalla kuvakkeella
+- **MP3-linkin kopiointi:** soivan jakson suoran MP3-linkin voi kopioida ja avata missä tahansa muussa soittimessa
 - Kuulokkeiden ja lukitusnäytön painikkeet toimivat
 - Pikanäppäimet tietokoneella: `välilyönti` = toisto/tauko, `←` `→` = hyppy
 
@@ -41,6 +42,8 @@ Jakson voi lisätä myös suoraan sivulta kirjanmerkillä, katso [Kirjanmerkki](
 - **Kelauspalkki:** vedä palkkia, niin pääset haluamaasi kohtaan. Vasemmalla näkyy kulunut aika, oikealla jäljellä oleva aika.
 - **Speed:** napauta vaihtaaksesi toistonopeutta järjestyksessä 1× → 1,2× → 1,5× → 1,75× → 2× → 0,8×.
 - **Skip:** napauta vaihtaaksesi hypyn pituutta järjestyksessä 10 → 15 → 20 → 30 s. Sama pituus on käytössä kuulokkeiden ja lukitusnäytön painikkeissa.
+
+- **MP3 link:** kopioi soittimessa olevan jakson suoran MP3-linkin leikepöydälle. Linkin voi liittää esimerkiksi VLC:hen, podcast-sovellukseen tai selaimen osoiteriville, jos haluat kuunnella jakson jossain muualla.
 
 Nopeus ja hypyn pituus tallentuvat, joten ne ovat samat, kun avaat soittimen seuraavan kerran.
 

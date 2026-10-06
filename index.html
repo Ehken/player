@@ -129,6 +129,7 @@
   /* Setting pills */
   .pills { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
   .pill { height: 36px; padding: 0 14px; border-radius: 999px; background: var(--surface); box-shadow: var(--shadow); font: 600 14px/1 var(--body); display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+  .pill:disabled { opacity: .45; cursor: default; }
   .pill small { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
 
   /* Library */
@@ -236,6 +237,10 @@
     <div class="pills">
       <button class="pill" id="rate" type="button" aria-label="Playback speed"><small>Speed</small><b id="rateVal">1×</b></button>
       <button class="pill" id="skipLen" type="button" aria-label="Skip length"><small>Skip</small><b id="skipVal">20 s</b></button>
+      <button class="pill" id="copyMp3" type="button" aria-label="Copy the episode's MP3 link" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>
+        <b>MP3 link</b>
+      </button>
     </div>
   </section>
 
@@ -383,6 +388,25 @@ function applySettings() {
 $('rate').onclick = () => { settings.rate = RATES[(RATES.indexOf(settings.rate) + 1) % RATES.length]; applySettings(); };
 $('skipLen').onclick = () => { settings.skip = SKIPS[(SKIPS.indexOf(settings.skip) + 1) % SKIPS.length]; applySettings(); };
 
+/* ---------- copy the current episode's MP3 link ---------- */
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch {}
+  try {   // fallback for browsers that refuse the clipboard API
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.append(ta); ta.select(); ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy'); ta.remove(); return ok;
+  } catch { return false; }
+}
+$('copyMp3').onclick = async () => {
+  if (!current) return;
+  if (await copyText(current)) return toast('MP3 link copied');
+  // Last resort: show the link in a field so it can be copied by hand.
+  showSheet('openPanel'); $('manualPl').hidden = true;
+  const f = $('url'); f.value = current; f.focus(); f.select();
+  toast('Select the link and copy it.');
+};
+
 /* ---------- open panel ---------- */
 const SHEETS = ['openPanel', 'addPanel', 'settingsPanel'];
 function showSheet(id) {
@@ -439,7 +463,7 @@ function openEpisode(url, autoplay, meta = {}) {
   cover.style.setProperty('--h1', h1);
   cover.style.setProperty('--h2', h2);
   status('Loading…');
-  ['seek', 'back', 'play', 'fwd'].forEach(id => $(id).disabled = false);
+  ['seek', 'back', 'play', 'fwd', 'copyMp3'].forEach(id => $(id).disabled = false);
 
   // "#t=" starts the file at the saved spot; play() must run right here, inside the tap,
   // or iPhones refuse to start the audio.
