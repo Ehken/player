@@ -151,6 +151,25 @@
   .act.on { color: var(--good); }
   .empty-lib { padding: 18px; color: var(--muted); font-size: 14px; background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); }
 
+  .top-actions { display: flex; gap: 10px; }
+  .open { max-height: 92vh; overflow-y: auto; }
+  .open label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .open label input { height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font: 16px var(--body); width: 100%; min-width: 0; }
+  .open .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .open .note { font-size: 13px; color: var(--muted); margin: 0; }
+  .open hr { border: 0; border-top: 1px solid var(--line); margin: 4px 0; width: 100%; }
+  .open h3 { margin: 0; font: 600 15px/1.3 var(--display); }
+  .share { display: flex; gap: 8px; }
+  .share input { flex: 1; min-width: 0; height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); font: 13px ui-monospace, Menlo, monospace; }
+  .ok { color: var(--good); }
+  .lib-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .lib-head small { color: var(--muted); font-size: 12px; }
+  .show-group { display: grid; gap: 10px; }
+  .show-group + .show-group { margin-top: 10px; }
+  .show-name { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font: 600 16px/1.2 var(--display); }
+  .show-name span { color: var(--muted); font: 500 13px var(--body); }
+  .more { width: 100%; padding: 14px 16px; text-align: center; font-weight: 600; font-size: 14px; color: var(--accent); border-top: 1px solid var(--line); }
+  .badge.new { background: var(--accent); color: var(--accent-ink); }
   .hint { text-align: center; color: var(--muted); font-size: 12px; }
   .hint kbd { font: 11px ui-monospace, Menlo, monospace; border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
   @media (hover: none) { .hint { display: none; } }
@@ -177,9 +196,14 @@
       </span>
       Episode Player
     </div>
-    <button class="icon-btn" id="openToggle" type="button" aria-label="Add an episode" aria-expanded="false">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-    </button>
+    <div class="top-actions">
+      <button class="icon-btn" id="settingsToggle" type="button" aria-label="Playlist settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg>
+      </button>
+      <button class="icon-btn" id="openToggle" type="button" aria-label="Add an episode" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </div>
   </header>
 
 
@@ -221,6 +245,11 @@
     <p class="empty-lib" id="emptyLib" hidden>Episodes you add show up here, with how far you got.</p>
   </section>
 
+  <section class="lib" id="plSection" aria-label="Playlist" hidden>
+    <div class="lib-head"><h2>Playlist</h2><small id="plStatus"></small></div>
+    <div id="plList"></div>
+  </section>
+
   <p class="hint"><kbd>Space</kbd> play/pause · <kbd>←</kbd> <kbd>→</kbd> skip</p>
 </main>
 
@@ -240,6 +269,53 @@
     <button class="btn" id="paste" type="button">Paste</button>
     <button class="btn" id="addOnly" type="button">Add to list</button>
     <button class="btn primary" type="submit">Play now</button>
+  </div>
+  <div id="manualPl" hidden>
+    <hr>
+    <h3>Or save it to the playlist</h3>
+    <label>Title<input id="mTitle" type="text" autocomplete="off" placeholder="Episode title"></label>
+    <label>Show<input id="mShow" type="text" autocomplete="off" placeholder="Show name"></label>
+    <button class="btn primary" id="mSave" type="button" style="width:100%">Save to playlist</button>
+  </div>
+</form>
+
+<form class="open" id="addPanel" role="dialog" aria-modal="true" aria-labelledby="addTitle" hidden>
+  <div class="sheet-head">
+    <h2 id="addTitle">Save to playlist?</h2>
+    <button class="icon-btn" data-close type="button" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <p class="note">Everyone with the playlist link will see this episode.</p>
+  <label>Title<input id="aTitle" type="text" autocomplete="off" required></label>
+  <label>Show<input id="aShow" type="text" autocomplete="off" required></label>
+  <div class="row2">
+    <button class="btn" id="aJustPlay" type="button">Just play</button>
+    <button class="btn primary" type="submit">Save &amp; play</button>
+  </div>
+</form>
+
+<form class="open" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="setTitle" hidden>
+  <div class="sheet-head">
+    <h2 id="setTitle">Playlist</h2>
+    <button class="icon-btn" data-close type="button" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <p class="note" id="setStatus">Not connected. Open a playlist link, or enter the details below.</p>
+  <label>Playlist address<input id="sUrl" type="url" autocomplete="off" placeholder="https://…"></label>
+  <label>Read key<input id="sKey" type="text" autocomplete="off" spellcheck="false"></label>
+  <label>Write password<input id="sWkey" type="password" autocomplete="off"></label>
+  <p class="note">Enter the write password only on your own device. Leave it empty on devices that just listen.</p>
+  <div class="row2">
+    <button class="btn" id="sDisconnect" type="button">Disconnect</button>
+    <button class="btn primary" type="submit">Save</button>
+  </div>
+  <div id="shareBox" hidden>
+    <hr>
+    <h3>Share link</h3>
+    <p class="note">Opens the playlist on another device. It contains the read key only, never the write password. Share it only with family.</p>
+    <div class="share"><input id="shareLink" type="text" readonly aria-label="Share link"><button class="btn" id="copyShare" type="button">Copy</button></div>
   </div>
 </form>
 
@@ -279,6 +355,8 @@ const parts = name => {
   return { show: name, code: words.slice(0, 2).map(w => w[0]).join('').toUpperCase() || '♪' };
 };
 const PALETTE = [[222, 258], [200, 232], [262, 300], [12, 340], [28, 8], [176, 210], [340, 280], [150, 196]];
+const prettyCode = c => String(c).replace(/^S(\d+)\s*E(\d+)$/i, 'S$1·E$2');
+const codeFrom = url => { const m = nameFrom(url).match(/s(\d{1,3})\s*e(\d{1,3})/i); return m ? `S${m[1].padStart(2, '0')}E${m[2].padStart(2, '0')}` : ''; };
 const hues = s => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return PALETTE[h % PALETTE.length]; };
 
 let toastTimer;
@@ -306,16 +384,25 @@ $('rate').onclick = () => { settings.rate = RATES[(RATES.indexOf(settings.rate) 
 $('skipLen').onclick = () => { settings.skip = SKIPS[(SKIPS.indexOf(settings.skip) + 1) % SKIPS.length]; applySettings(); };
 
 /* ---------- open panel ---------- */
+const SHEETS = ['openPanel', 'addPanel', 'settingsPanel'];
+function showSheet(id) {
+  SHEETS.forEach(s => $(s).hidden = s !== id);
+  $('scrim').hidden = !id;
+  $('openToggle').setAttribute('aria-expanded', String(id === 'openPanel'));
+}
+const closeSheets = () => showSheet(null);
 function showOpen(show) {
-  $('openPanel').hidden = !show;
-  $('scrim').hidden = !show;
-  $('openToggle').setAttribute('aria-expanded', String(show));
-  if (show) { $('url').value = ''; setTimeout(() => $('url').focus(), 50); }
+  if (!show) return closeSheets();
+  showSheet('openPanel');
+  $('url').value = '';
+  $('manualPl').hidden = !canWrite();
+  setTimeout(() => $('url').focus(), 50);
 }
 $('openToggle').onclick = () => showOpen(true);
-$('closeSheet').onclick = () => showOpen(false);
-$('scrim').onclick = () => showOpen(false);
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('openPanel').hidden) showOpen(false); });
+$('closeSheet').onclick = closeSheets;
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = closeSheets);
+$('scrim').onclick = closeSheets;
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('scrim').hidden) closeSheets(); });
 const validUrl = u => { try { return /^https?:$/.test(new URL(u).protocol); } catch { return false; } };
 $('openPanel').addEventListener('submit', e => { e.preventDefault(); const u = $('url').value.trim(); if (validUrl(u)) openEpisode(u, true); });
 $('addOnly').onclick = () => {
@@ -332,7 +419,7 @@ $('paste').onclick = async () => {
 };
 
 /* ---------- playback ---------- */
-function openEpisode(url, autoplay) {
+function openEpisode(url, autoplay, meta = {}) {
   if (!url) return;
   if (current) persist();
   current = url;
@@ -342,29 +429,35 @@ function openEpisode(url, autoplay) {
   if (start > 15 && ep.at && Date.now() - ep.at > REWIND_AFTER) { start = Math.max(0, start - REWIND_BY); rewound = true; }
 
   const name = ep.name || nameFrom(url), p = parts(name);
-  $('title').textContent = name;
-  $('coverShow').textContent = p.show;
-  $('coverCode').textContent = p.code;
-  const cover = $('cover'), [h1, h2] = hues(p.show);
+  const title = meta.title || ep.title || '', show = meta.show || ep.show || '', code = meta.code || ep.code || '';
+  const showName = show || p.show;
+  $('title').textContent = title || name;
+  $('coverShow').textContent = showName;
+  $('coverCode').textContent = code ? prettyCode(code) : p.code;
+  const cover = $('cover'), [h1, h2] = hues(showName);
   cover.classList.remove('empty');
   cover.style.setProperty('--h1', h1);
   cover.style.setProperty('--h2', h2);
   status('Loading…');
   ['seek', 'back', 'play', 'fwd'].forEach(id => $(id).disabled = false);
 
-  audio.src = url;
+  // "#t=" starts the file at the saved spot; play() must run right here, inside the tap,
+  // or iPhones refuse to start the audio.
+  audio.src = start > 0 ? `${url}#t=${Math.floor(start)}` : url;
   applySettings();
+  pausedAt = 0;
+  if (autoplay) audio.play().catch(() => status('Tap play to start'));
   audio.addEventListener('loadedmetadata', () => {
-    if (start > 0 && start < audio.duration - 2) audio.currentTime = start;
-    status(rewound ? `Resumed ${REWIND_BY} s before where you stopped` : start > 5 ? `Resumed at ${fmt(start)}` : 'Ready');
-    if (autoplay) audio.play().catch(() => {});
+    if (start > 0 && start < audio.duration - 2 && Math.abs(audio.currentTime - start) > 2) audio.currentTime = start;
+    if (audio.paused) status(rewound ? `Resumed ${REWIND_BY} s before where you stopped` : start > 5 ? `Resumed at ${fmt(start)}` : 'Ready');
   }, { once: true });
 
-  eps[url] = { ...ep, name, pos: start, at: Date.now(), done: false };
+  eps[url] = { ...ep, name, title, show, code, pos: start, at: Date.now(), done: false };
   save('episodes', eps);
   showOpen(false);
   renderRecent();
-  if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: name, artist: p.show });
+  renderPlaylist();
+  if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: title || name, artist: showName });
 }
 function status(t) { $('status').textContent = t; }
 
@@ -423,6 +516,7 @@ function persist(finished) {
   eps[current] = { ...ep, pos: done ? audio.duration : audio.currentTime, dur: audio.duration, at: Date.now(), done };
   save('episodes', eps);
   renderRecent();
+  renderPlaylist();
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
 window.addEventListener('pagehide', () => persist());
@@ -443,7 +537,7 @@ function renderRecent() {
 
     const main = document.createElement('button');
     main.type = 'button'; main.className = 'item-main';
-    const t = document.createElement('span'); t.className = 'item-title'; t.textContent = ep.name || nameFrom(url);
+    const t = document.createElement('span'); t.className = 'item-title'; t.textContent = ep.title || ep.name || nameFrom(url);
     const sub = document.createElement('span'); sub.className = 'item-sub';
     if (url === current) { const b = document.createElement('span'); b.className = 'badge'; b.textContent = audio.paused ? 'Current' : 'Playing'; sub.append(b); }
     if (ep.done) { const b = document.createElement('span'); b.className = 'badge done'; b.textContent = 'Listened'; sub.append(b); }
@@ -497,18 +591,244 @@ if ('mediaSession' in navigator) {
   set('seekto', d => { if (d.seekTime != null) audio.currentTime = d.seekTime; });
 }
 
+/* ---------- playlist (optional — everything else works without it) ---------- */
+let plCfg = load('playlistCfg', null);          // { url, key, wkey? } — saved only on this device
+let plCache = load('playlistCache', { episodes: [], at: 0 });
+let plSeen = new Set(load('playlistSeen', []));  // episodes this device has already been shown
+let plOpenShows = new Set();
+const canWrite = () => !!(plCfg && plCfg.url && plCfg.wkey);
+
+const b64e = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const b64d = t => JSON.parse(decodeURIComponent(escape(atob(t.replace(/-/g, '+').replace(/_/g, '/')))));
+const shareLink = () => plCfg ? `${location.origin}${location.pathname}#p=${b64e({ u: plCfg.url, k: plCfg.key })}` : '';
+const validFeed = u => /^https:\/\/[^\s]+$/.test(u);
+
+async function fetchPlaylist(quiet) {
+  if (!plCfg) return;
+  $('plStatus').textContent = 'Updating…';
+  try {
+    const r = await fetch(`${plCfg.url}?key=${encodeURIComponent(plCfg.key)}`, { cache: 'no-store' });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error === 'not_allowed' ? 'The playlist link is no longer valid. Ask for a new one.' : 'The playlist could not be loaded.');
+    const firstSync = !plCache.at;
+    const fresh = data.episodes.filter(e => !plSeen.has(e.mp3) && !eps[e.mp3]);
+    if (firstSync) data.episodes.forEach(e => plSeen.add(e.mp3));   // nothing is "new" on the very first load
+    save('playlistSeen', [...plSeen]);
+    plCache = { episodes: data.episodes, at: Date.now() };
+    save('playlistCache', plCache);
+    renderPlaylist();
+    if (!firstSync && fresh.length && !quiet) toast(fresh.length === 1 ? `New episode: ${fresh[0].title || fresh[0].show}` : `${fresh.length} new episodes`);
+  } catch (err) {
+    $('plStatus').textContent = plCache.at ? `Offline · updated ${ago(plCache.at)}` : '';
+    if (!quiet) toast(err.message && !/fetch|network|json/i.test(err.message) ? err.message : 'Playlist could not be updated. Check your connection.');
+  }
+}
+const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
+const isNew = e => !plSeen.has(e.mp3) && !eps[e.mp3];
+
+function renderPlaylist() {
+  const sec = $('plSection'), box = $('plList');
+  sec.hidden = !plCfg;
+  if (!plCfg) return;
+  box.textContent = '';
+  const groups = new Map();
+  const names = new Map();   // group shows case-insensitively, keep the first spelling
+  for (const e of plCache.episodes) {
+    const raw = e.show || parts(nameFrom(e.mp3)).show, k = raw.toLowerCase();
+    if (!names.has(k)) names.set(k, raw);
+    const show = names.get(k);
+    if (!groups.has(show)) groups.set(show, []);
+    groups.get(show).push(e);
+  }
+  const newCount = plCache.episodes.filter(isNew).length;
+  $('plStatus').textContent = plCache.at ? (newCount ? `${newCount} new · ` : '') + `updated ${ago(plCache.at)}` : 'Loading…';
+  if (plCache.at && !plCache.episodes.length) {
+    const p = document.createElement('p'); p.className = 'empty-lib'; p.textContent = 'The playlist is empty.'; box.append(p); return;
+  }
+  for (const [show, list] of groups) {
+    const g = document.createElement('div'); g.className = 'show-group';
+    const h = document.createElement('div'); h.className = 'show-name';
+    const n = document.createElement('span');
+    const nNew = list.filter(isNew).length;
+    n.textContent = `${list.length} episode${list.length === 1 ? '' : 's'}` + (nNew ? ` · ${nNew} new` : '');
+    h.append(document.createTextNode(show), n);
+    const ul = document.createElement('ul'); ul.className = 'list';
+    const open = plOpenShows.has(show), shown = open ? list : list.slice(0, 5);
+    for (const e of shown) ul.append(plItem(e, show));
+    if (list.length > 5) {
+      const li = document.createElement('li'), b = document.createElement('button');
+      b.type = 'button'; b.className = 'more';
+      b.textContent = open ? 'Show fewer' : `Show all ${list.length}`;
+      b.onclick = () => { open ? plOpenShows.delete(show) : plOpenShows.add(show); renderPlaylist(); };
+      li.append(b); ul.append(li);
+    }
+    g.append(h, ul); box.append(g);
+  }
+}
+
+function plItem(e, show) {
+  const ep = eps[e.mp3] || {};
+  const li = document.createElement('li');
+  li.className = 'item' + (ep.done ? ' is-done' : '');
+  const main = document.createElement('button');
+  main.type = 'button'; main.className = 'item-main';
+  const t = document.createElement('span'); t.className = 'item-title'; t.textContent = e.title || nameFrom(e.mp3);
+  const sub = document.createElement('span'); sub.className = 'item-sub';
+  const tag = (cls, txt) => { const b = document.createElement('span'); b.className = 'badge ' + cls; b.textContent = txt; sub.append(b); };
+  if (isNew(e)) tag('new', 'New');
+  else if (e.mp3 === current) tag('', audio.paused ? 'Current' : 'Playing');
+  else if (ep.done) tag('done', 'Listened');
+  const bits = [];
+  if (e.episode) bits.push(prettyCode(e.episode));
+  if (e.published) bits.push(new Date(e.published + 'T12:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'short' }));
+  if (!ep.done && ep.dur && ep.pos > 5) bits.push(`${fmt(ep.dur - ep.pos)} left`);
+  const info = document.createElement('span'); info.textContent = bits.join(' · '); sub.append(info);
+  main.append(t, sub);
+  if (ep.dur && ep.pos > 5) {
+    const bar = document.createElement('span'); bar.className = 'bar';
+    const fill = document.createElement('i'); fill.style.width = (ep.done ? 100 : Math.min(100, ep.pos / ep.dur * 100)) + '%';
+    bar.append(fill); main.append(bar);
+  }
+  main.onclick = () => { plSeen.add(e.mp3); save('playlistSeen', [...plSeen]); openEpisode(e.mp3, true, { title: e.title, show, code: e.episode }); };
+  li.append(main);
+  return li;
+}
+
+async function addToPlaylist(item) {
+  try {
+    const r = await fetch(plCfg.url, { method: 'POST', body: JSON.stringify({ key: plCfg.wkey, ...item }) });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error === 'not_allowed' ? 'Wrong write password. Check it in Playlist settings.' : 'Could not save to the playlist.');
+    plSeen.add(item.mp3); save('playlistSeen', [...plSeen]);
+    toast(data.duplicate ? 'Already in the playlist' : 'Saved to playlist');
+    fetchPlaylist(true);
+    return true;
+  } catch (err) {
+    toast(err.message && !/fetch|network|json/i.test(err.message) ? err.message : 'Could not reach the playlist. Check your connection.');
+    return false;
+  }
+}
+
+/* settings sheet */
+function fillSettings() {
+  $('sUrl').value = plCfg?.url || '';
+  $('sKey').value = plCfg?.key || '';
+  $('sWkey').value = plCfg?.wkey || '';
+  $('setStatus').textContent = plCfg
+    ? (canWrite() ? 'Connected. This device can add episodes.' : 'Connected. This device can listen but not add episodes.')
+    : 'Not connected. Open a playlist link, or enter the details below.';
+  $('shareBox').hidden = !plCfg;
+  $('shareLink').value = shareLink();
+}
+$('settingsToggle').onclick = () => { fillSettings(); showSheet('settingsPanel'); };
+$('settingsPanel').addEventListener('submit', e => {
+  e.preventDefault();
+  const url = $('sUrl').value.trim(), key = $('sKey').value.trim(), wkey = $('sWkey').value.trim();
+  if (!validFeed(url)) { toast('The address should start with https://'); return; }
+  if (!key) { toast('Enter the read key.'); return; }
+  const changed = !plCfg || plCfg.url !== url || plCfg.key !== key;
+  plCfg = { url, key, ...(wkey ? { wkey } : {}) };
+  save('playlistCfg', plCfg);
+  if (changed) { plCache = { episodes: [], at: 0 }; save('playlistCache', plCache); }
+  fillSettings(); renderPlaylist(); fetchPlaylist();
+  toast('Playlist saved');
+});
+$('sDisconnect').onclick = () => {
+  plCfg = null; plCache = { episodes: [], at: 0 };
+  try { ['playlistCfg', 'playlistCache', 'playlistSeen'].forEach(k => localStorage.removeItem(k)); } catch {}
+  plSeen = new Set();
+  fillSettings(); renderPlaylist(); closeSheets();
+  toast('Playlist removed from this device');
+};
+$('copyShare').onclick = async () => {
+  const inp = $('shareLink');
+  try { await navigator.clipboard.writeText(inp.value); toast('Link copied'); }
+  catch { inp.focus(); inp.select(); toast('Select the link and copy it.'); }
+};
+
+/* "Save to playlist?" sheet (opened by the bookmarklet on a device that can add) */
+let pendingAdd = null;
+const matchShow = name => (plCache.episodes || []).map(e => e.show).find(s => s && s.toLowerCase() === String(name).toLowerCase()) || name;
+function cleanTitle(t) {
+  const parts = String(t || '').split(/\s+[|·–—]\s+/).map(x => x.trim()).filter(Boolean);
+  return parts.sort((a, b) => b.length - a.length)[0] || '';
+}
+function askAdd(item) {
+  pendingAdd = item;
+  $('aTitle').value = item.title;
+  $('aShow').value = item.show;
+  showSheet('addPanel');
+}
+$('addPanel').addEventListener('submit', async e => {
+  e.preventDefault();
+  const item = { ...pendingAdd, title: $('aTitle').value.trim(), show: $('aShow').value.trim() };
+  closeSheets();
+  openEpisode(item.mp3, true, { title: item.title, show: item.show, code: item.episode });
+  await addToPlaylist(item);
+});
+$('aJustPlay').onclick = () => { const i = pendingAdd; closeSheets(); openEpisode(i.mp3, true, { title: i.title, show: i.show, code: i.episode }); };
+$('mSave').onclick = async () => {
+  const mp3 = $('url').value.trim();
+  if (!validUrl(mp3)) { $('url').reportValidity(); return; }
+  const title = $('mTitle').value.trim() || nameFrom(mp3), show = matchShow($('mShow').value.trim() || parts(nameFrom(mp3)).show);
+  closeSheets();
+  await addToPlaylist({ mp3, title, show, episode: codeFrom(mp3) });
+};
+
 /* ---------- start ---------- */
 applySettings();
 renderRecent();
-const qp = new URLSearchParams(location.search).get('url');
-if (qp) {
-  $('url').value = qp;
-  openEpisode(qp, false);
-  try { history.replaceState(null, '', location.pathname); } catch {}
+
+// Incoming data arrives after "#" (never sent to the server) — or "?" from older bookmarklets.
+const hash = new URLSearchParams(location.hash.slice(1));
+const query = new URLSearchParams(location.search);
+const param = k => hash.get(k) ?? query.get(k);
+
+if (hash.get('p')) {                      // playlist link: #p=…
+  try {
+    const { u, k } = b64d(hash.get('p'));
+    if (validFeed(u) && k) {
+      const same = plCfg && plCfg.url === u && plCfg.key === k;
+      if (!same) { plCfg = { url: u, key: k, ...(plCfg?.url === u && plCfg?.wkey ? { wkey: plCfg.wkey } : {}) }; plCache = { episodes: [], at: 0 }; }
+      save('playlistCfg', plCfg); save('playlistCache', plCache);
+      if (!same) toast('Playlist connected');
+    }
+  } catch { toast('This playlist link is broken.'); }
+}
+renderPlaylist();
+if (plCfg) fetchPlaylist(true);
+
+const incoming = param('url');
+if (incoming && validUrl(incoming)) {
+  const fromName = parts(nameFrom(incoming));
+  const item = {
+    mp3: incoming,
+    title: cleanTitle(param('title')) || nameFrom(incoming),
+    show: matchShow(param('show') || (fromName.show !== nameFrom(incoming) ? fromName.show : '')),
+    episode: codeFrom(incoming),
+    published: (param('published') || '').slice(0, 10),
+    article: param('article') || ''
+  };
+  $('url').value = incoming;
+  if (canWrite() && !(plCache.episodes || []).some(e => e.mp3 === incoming)) {
+    openEpisode(incoming, false, { title: item.title, show: item.show, code: item.episode });
+    askAdd(item);
+  } else {
+    openEpisode(incoming, false, { title: item.title, show: item.show, code: item.episode });
+  }
 } else {
   const last = Object.entries(eps).filter(([, e]) => !e.done).sort((a, b) => (b[1].at || 0) - (a[1].at || 0))[0];
   if (last) openEpisode(last[0], false);
 }
+if (location.hash || location.search) { try { history.replaceState(null, '', location.pathname); } catch {} }
+
+// A new playlist or episode link opened while the player is already open.
+window.addEventListener('hashchange', () => { if (/[#&](p|url)=/.test(location.hash)) location.reload(); });
+
+// Check for new episodes when the player comes back to the foreground.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && plCfg && Date.now() - (plCache.at || 0) > 5 * 60 * 1000) fetchPlaylist();
+});
 </script>
 </body>
 </html>

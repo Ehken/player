@@ -12,6 +12,7 @@ Yksinkertainen selainsoitin MP3-tiedostoille ja podcasteille. Soitin muistaa, mi
 - **Muistaa kohdan:** sijainti tallentuu 5 sekunnin välein ja aina kun toisto pysähtyy, esimerkiksi kun otat kuulokkeet pois
 - **Palaa hieman taaksepäin:** kun jatkat yli 2 minuutin tauon jälkeen, toisto alkaa 10 sekuntia aiemmasta kohdasta
 - **Jatka kuuntelua -lista:** jaksot, edistymispalkki ja jäljellä oleva aika
+- **Soittolista (valinnainen):** yhteinen jaksolista useammalle laitteelle, uudet jaksot merkitään **New**
 - Merkitse jakso kuunnelluksi tai poista se listalta (poiston voi perua)
 - Jakson voi lisätä listalle kuuntelematta sitä heti
 - Asennettavissa puhelimen aloitusnäyttöön omalla kuvakkeella
@@ -84,18 +85,65 @@ Kun soitin on aloitusnäytöllä, se aukeaa omana sovelluksenaan ilman selaimen 
 
 **Huom. iPhonessa** aloitusnäytöltä avattu soitin pitää oman listansa, erillään selaimesta. Kirjanmerkki avaa jaksot aina selaimessa, joten niiden kohdat ja lista näkyvät selaimessa, eivät aloitusnäytön sovelluksessa. Jos käytät kirjanmerkkiä, käytä soitinta myös selaimessa.
 
+## Soittolista (valinnainen)
+
+Soittimeen voi yhdistää soittolistan, jonka jaksot näkyvät kaikilla siihen yhdistetyillä laitteilla. Kun soittolistalle lisätään jakso, se ilmestyy muille laitteille automaattisesti merkinnällä **New**. Soitin toimii täysin myös ilman soittolistaa.
+
+Soittolista ei ole osa tätä repoa. Se on erillinen, yksityinen palvelu, jonka osoitteen ja avaimet saat soittolistan ylläpitäjältä. Soittimeen tallentuvat vain yhteystiedot, ja nekin vain omalle laitteellesi.
+
+### Soittolistan yhdistäminen
+
+**Linkillä (helpoin)**
+1. Avaa soittolistan ylläpitäjältä saamasi linkki laitteella, jolla haluat kuunnella.
+2. Soitin ilmoittaa **Playlist connected**, ja jaksot näkyvät otsikon **Playlist** alla.
+3. Lisää soitin halutessasi aloitusnäyttöön (katso [Aloitusnäyttöön](#aloitusnäyttöön)). Avaa linkki ensin selaimessa ja lisää soitin vasta sitten aloitusnäyttöön.
+
+**Käsin**
+1. Paina yläkulman **säätimet**-kuvaketta (kaksi liukusäädintä).
+2. Täytä **Playlist address** ja **Read key**.
+3. Täytä **Write password** vain, jos tällä laitteella saa lisätä jaksoja soittolistalle. Kuuntelulaitteilla kenttä jätetään tyhjäksi.
+4. Paina **Save**.
+
+### Soittolistan käyttö
+
+- Jaksot on ryhmitelty ohjelmittain, uusin ensin. Jokaisesta jaksosta näkyy jakson tunnus, julkaisupäivä ja edistyminen.
+- **New** tarkoittaa jaksoa, jota ei ole vielä avattu tällä laitteella. Kun laite yhdistetään ensimmäistä kertaa, olemassa olevia jaksoja ei merkitä uusiksi.
+- Napauta jaksoa, niin toisto alkaa. Kuuntelukohta tallentuu laitekohtaisesti, eli jokaisella kuuntelijalla on oma kohtansa.
+- Soitin tarkistaa uudet jaksot, kun se avataan tai tuodaan näkyviin (enintään 5 minuutin välein). Viimeksi ladattu lista näkyy myös ilman verkkoyhteyttä.
+- Jos ohjelmalla on yli 5 jaksoa, loput saa näkyviin painikkeella **Show all**.
+
+### Jaksojen lisääminen soittolistalle
+
+Toimii vain laitteella, jolle on tallennettu kirjoitussalasana.
+
+- **Kirjanmerkillä:** avaa jakson sivu ja paina kirjanmerkkiä. Soitin kysyy **Save to playlist?**. Tarkista otsikko ja ohjelman nimi ja valitse **Save & play**, tai **Just play**, jos et halua lisätä jaksoa.
+- **Soittimessa:** paina **+**, liitä MP3-osoite, täytä **Title** ja **Show** ja paina **Save to playlist**.
+
+Samaa jaksoa ei voi lisätä kahdesti.
+
+### Soittolistan jakaminen toiselle laitteelle
+
+1. Paina säätimet-kuvaketta laitteella, jossa soittolista on jo yhdistetty.
+2. Kohdassa **Share link** on valmis linkki. Paina **Copy** ja avaa linkki toisella laitteella.
+
+Jakolinkissä on vain lukuavain, ei koskaan kirjoitussalasanaa. Jaa linkki vain niille, joille soittolista on tarkoitettu.
+
+### Soittolistan poistaminen laitteelta
+
+Säätimet → **Disconnect**. Soittolista ja sen tiedot poistuvat siltä laitteelta. Kuuntelukohdat säilyvät.
+
 ## Kirjanmerkki: jakso suoraan sivulta soittimeen
 
 Monella sivulla podcast-jakson MP3-osoite ei näy suoraan, varsinkaan jos jakso on maksumuurin takana. Kirjanmerkki hoitaa tämän puolestasi. Kun painat sitä sivulla, jolla jakso on, se etsii sivulta jakson MP3-osoitteen ja avaa sen suoraan soittimessa.
 
-**Miksi kirjanmerkki?** Maksumuurin takana MP3-osoite näkyy vain kirjautuneelle käyttäjälle. Siksi haun täytyy tapahtua sinun omassa selaimessasi, jossa olet jo kirjautunut. Kirjanmerkki ei lähetä tunnuksiasi tai muita tietoja minnekään, vaan se vain lukee MP3-osoitteen avoimelta sivulta ja avaa sen soittimessa.
+**Miksi kirjanmerkki?** Maksumuurin takana MP3-osoite näkyy vain kirjautuneelle käyttäjälle. Siksi haun täytyy tapahtua sinun omassa selaimessasi, jossa olet jo kirjautunut. Kirjanmerkki ei lähetä tunnuksiasi minnekään. Se lukee avoimelta sivulta jakson MP3-osoitteen, otsikon ja julkaisupäivän ja avaa ne soittimessa. Tiedot kulkevat linkin `#`-merkin jälkeen, joten ne eivät päädy GitHubin palvelimelle.
 
 ### Kirjanmerkin koodi
 
 Kopioi koko rivi:
 
 ```
-javascript:(()=>{let u=[...document.querySelectorAll('audio,audio source')].map(e=>e.currentSrc||e.src).find(s=>/\.mp3/i.test(s));if(!u){const m=document.documentElement.innerHTML.match(/https?:(?:\\?\/){2}[^"'\s<>]+?\.mp3[^"'\s<>]*/i);if(m)u=m[0]}if(!u){alert('MP3-linkkiä ei löytynyt. Paina ensin play sivun soittimessa ja kokeile uudelleen.');return}u=u.replace(/\\\//g,'/').replace(/&amp;/g,'&');location.href='https://ehken.github.io/player/?url='+encodeURIComponent(u)})()
+javascript:(()=>{let u=[...document.querySelectorAll('audio,audio source')].map(e=>e.currentSrc||e.src).find(s=>/\.mp3/i.test(s));if(!u){const m=document.documentElement.innerHTML.match(/https?:(?:\\?\/){2}[^"'\s<>]+?\.mp3[^"'\s<>]*/i);if(m)u=m[0]}if(!u){alert('MP3-linkkiä ei löytynyt. Paina ensin play sivun soittimessa ja kokeile uudelleen.');return}u=u.replace(/\\\//g,'/').replace(/&amp;/g,'&');const q=s=>document.querySelector(s),t=(q('meta[property="og:title"]')||{}).content||(q('h1')||{}).textContent||document.title,p=(q('meta[property="article:published_time"]')||{}).content||(q('time[datetime]')||{}).dateTime||'';location.href='https://ehken.github.io/player/#'+new URLSearchParams({url:u,title:t.trim(),published:p,article:location.href.split('#')[0]})})()
 ```
 
 ### Asennus
@@ -124,6 +172,7 @@ Jos sama selain on synkronoitu tietokoneen ja puhelimen välillä (esim. Brave S
    - **Android Chrome:** kirjoita osoiteriville kirjanmerkin nimi ja valitse se ehdotuksista. Kirjanmerkkilistasta napauttaminen ei toimi Chromessa.
    - **Tietokone:** klikkaa kirjanmerkkiä kirjanmerkkipalkista.
 3. Soitin aukeaa, ja jakso on valmiina siinä kohdassa, mihin jäit (uusi jakso alusta). Paina play.
+4. Jos soittimeen on yhdistetty soittolista ja laitteelle on tallennettu kirjoitussalasana, soitin kysyy **Save to playlist?**. Tarkista otsikko ja ohjelman nimi ja valitse **Save & play**, tai **Just play**, jos et halua lisätä jaksoa soittolistalle.
 
 ### Jos se ei toimi
 
@@ -139,4 +188,4 @@ Jos sama selain on synkronoitu tietokoneen ja puhelimen välillä (esim. Brave S
 
 ## Tekniikka
 
-Yksi HTML-tiedosto (`index.html`) sekä kuvakkeet ja `manifest.webmanifest` aloitusnäyttöä varten. Ei palvelinta, kirjastoja eikä seurantaa. Soitin toimii GitHub Pagesissa. Jakson voi avata suoraan linkillä muodossa `https://ehken.github.io/player/?url=<MP3-osoite>`.
+Yksi HTML-tiedosto (`index.html`) sekä kuvakkeet ja `manifest.webmanifest` aloitusnäyttöä varten. Ei palvelinta, kirjastoja eikä seurantaa. Soitin toimii GitHub Pagesissa. Jakson voi avata suoraan linkillä muodossa `https://ehken.github.io/player/#url=<MP3-osoite>`.
