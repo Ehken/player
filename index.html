@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Episode Player</title>
+<style>
+  /* Layout: one centered "deck" card, transport row, scrub bar, recent list below */
+  :root {
+    --bg: #eef1f4; --surface: #ffffff; --fg: #1b2430; --muted: #66727f;
+    --line: #d5dbe2; --accent: #1f6f8b; --accent-fg: #ffffff;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #12171d; --surface: #1b222b; --fg: #e6ebf0; --muted: #94a0ad;
+      --line: #2d3742; --accent: #5cb3d1; --accent-fg: #0d1a20; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--sans);
+    padding: 32px 16px; }
+  main { max-width: 560px; margin: 0 auto; display: grid; gap: 20px; }
+  h1 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 16px; }
+  form { display: flex; gap: 8px; }
+  input[type=url] { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg); color: var(--fg); font: 14px var(--sans); }
+  button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--bg); color: var(--fg);
+    border-radius: 8px; padding: 10px 14px; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .title { font-size: 20px; font-weight: 600; text-wrap: balance; word-break: break-word; margin: 0; }
+  .status { color: var(--muted); font-size: 13px; margin: 0; min-height: 1.5em; }
+  .transport { display: flex; justify-content: center; align-items: center; gap: 12px; }
+  .transport button { min-width: 64px; font-variant-numeric: tabular-nums; }
+  #play { width: 72px; height: 72px; border-radius: 50%; font-size: 26px; padding: 0; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .times { display: flex; justify-content: space-between; font: 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .extras { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  select { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  li button { width: 100%; text-align: left; display: flex; justify-content: space-between; gap: 12px; background: var(--surface); }
+  li span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  li span:last-child { font: 12px var(--mono); color: var(--muted); flex-shrink: 0; }
+  kbd { font: 12px var(--mono); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Episode Player</h1>
+
+  <section class="card">
+    <form id="load">
+      <input id="url" type="url" required placeholder="Paste an .mp3 link">
+      <button class="primary" type="submit">Load</button>
+    </form>
+
+    <div>
+      <p class="title" id="title">No episode loaded</p>
+      <p class="status" id="status">Paste a link and press Load.</p>
+    </div>
+
+    <div>
+      <input id="seek" type="range" min="0" max="0" step="1" value="0" aria-label="Position">
+      <div class="times"><span id="cur">0:00</span><span id="dur">0:00</span></div>
+    </div>
+
+    <div class="transport">
+      <button id="back" type="button" title="Back 20 s (←)">−20 s</button>
+      <button id="play" type="button" class="primary" aria-label="Play">▶</button>
+      <button id="fwd" type="button" title="Forward 20 s (→)">+20 s</button>
+    </div>
+
+    <div class="extras">
+      <label>Speed
+        <select id="rate">
+          <option>0.8</option><option selected>1</option><option>1.2</option>
+          <option>1.5</option><option>1.75</option><option>2</option>
+        </select>×
+      </label>
+      <span><kbd>Space</kbd> play/pause · <kbd>←</kbd><kbd>→</kbd> 20 s</span>
+    </div>
+  </section>
+
+  <section>
+    <h1>Recent</h1>
+    <ul id="recent"></ul>
+  </section>
+</main>
+
+<audio id="audio" preload="metadata"></audio>
+
+<script>
+const SKIP = 20;
+const $ = id => document.getElementById(id);
+const audio = $('audio'), seek = $('seek');
+const store = {
+  get() { try { return JSON.parse(localStorage.getItem('episodes') || '{}'); } catch { return {}; } },
+  set(v) { try { localStorage.setItem('episodes', JSON.stringify(v)); } catch {} }
+};
+
+const fmt = s => {
+  if (!isFinite(s)) return '0:00';
+  s = Math.floor(s);
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = String(s % 60).padStart(2, '0');
+  return h ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${m}:${sec}`;
+};
+const nameFrom = url => {
+  try { return decodeURIComponent(new URL(url).pathname.split('/').pop().replace(/\+/g, ' ')).replace(/\.mp3$/i, ''); }
+  catch { return url; }
+};
+
+function load(url, autoplay) {
+  const eps = store.get();
+  const saved = eps[url]?.pos || 0;
+  audio.src = url;
+  audio.playbackRate = +$('rate').value;
+  $('title').textContent = nameFrom(url);
+  $('status').textContent = 'Loading…';
+  audio.addEventListener('loadedmetadata', () => {
+    if (saved > 5 && saved < audio.duration - 5) {
+      audio.currentTime = saved;
+      $('status').textContent = `Resumed at ${fmt(saved)}`;
+    } else $('status').textContent = 'Ready';
+    if (autoplay) audio.play().catch(() => {});
+  }, { once: true });
+  eps[url] = { ...(eps[url] || {}), name: nameFrom(url), pos: saved, at: Date.now() };
+  store.set(eps); renderRecent();
+  if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: nameFrom(url) });
+}
+
+const skip = d => { if (audio.src) audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + d)); };
+const toggle = () => { if (!audio.src) return; audio.paused ? audio.play() : audio.pause(); };
+
+$('load').addEventListener('submit', e => { e.preventDefault(); load($('url').value.trim(), true); });
+$('play').onclick = toggle;
+$('back').onclick = () => skip(-SKIP);
+$('fwd').onclick = () => skip(SKIP);
+$('rate').onchange = e => audio.playbackRate = +e.target.value;
+
+let dragging = false;
+seek.addEventListener('input', () => { dragging = true; $('cur').textContent = fmt(+seek.value); });
+seek.addEventListener('change', () => { audio.currentTime = +seek.value; dragging = false; });
+
+audio.addEventListener('loadedmetadata', () => { seek.max = Math.floor(audio.duration); $('dur').textContent = fmt(audio.duration); });
+audio.addEventListener('play', () => { $('play').textContent = '❚❚'; $('play').setAttribute('aria-label', 'Pause'); });
+audio.addEventListener('pause', () => { $('play').textContent = '▶'; $('play').setAttribute('aria-label', 'Play'); savePos(); });
+audio.addEventListener('error', () => { $('status').textContent = 'Could not load this file. Check the link opens in the browser.'; });
+
+let lastSave = 0;
+audio.addEventListener('timeupdate', () => {
+  if (!dragging) { seek.value = Math.floor(audio.currentTime); $('cur').textContent = fmt(audio.currentTime); }
+  if (Date.now() - lastSave > 5000) savePos();
+});
+function savePos() {
+  if (!audio.src) return;
+  lastSave = Date.now();
+  const eps = store.get(), url = audio.src;
+  const key = Object.keys(eps).find(k => k === url || new URL(k, location.href).href === url) || url;
+  eps[key] = { ...(eps[key] || {}), name: nameFrom(key), pos: audio.currentTime, dur: audio.duration, at: Date.now() };
+  store.set(eps); renderRecent();
+}
+window.addEventListener('beforeunload', savePos);
+
+function renderRecent() {
+  const list = $('recent'); list.textContent = '';
+  const items = Object.entries(store.get()).sort((a, b) => b[1].at - a[1].at).slice(0, 8);
+  if (!items.length) { const li = document.createElement('li'); li.className = 'status'; li.textContent = 'Episodes you play show up here with your position.'; list.append(li); return; }
+  for (const [url, ep] of items) {
+    const li = document.createElement('li'), b = document.createElement('button'), n = document.createElement('span'), t = document.createElement('span');
+    n.textContent = ep.name; t.textContent = ep.dur ? `${fmt(ep.pos)} / ${fmt(ep.dur)}` : fmt(ep.pos);
+    b.type = 'button'; b.append(n, t); b.onclick = () => { $('url').value = url; load(url, true); };
+    li.append(b); list.append(li);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'url') return;
+  if (e.code === 'Space') { e.preventDefault(); toggle(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); skip(-SKIP); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); skip(SKIP); }
+});
+
+// Headphone / lock-screen / media-key buttons
+if ('mediaSession' in navigator) {
+  const ms = navigator.mediaSession;
+  try {
+    ms.setActionHandler('play', () => audio.play());
+    ms.setActionHandler('pause', () => audio.pause());
+    ms.setActionHandler('seekbackward', () => skip(-SKIP));
+    ms.setActionHandler('seekforward', () => skip(SKIP));
+    ms.setActionHandler('previoustrack', () => skip(-SKIP));
+    ms.setActionHandler('nexttrack', () => skip(SKIP));
+  } catch {}
+}
+
+// Optional: open with ?url=<mp3 link>
+const qp = new URLSearchParams(location.search).get('url');
+if (qp) { $('url').value = qp; load(qp, false); }
+renderRecent();
+</script>
+</body>
+</html>
